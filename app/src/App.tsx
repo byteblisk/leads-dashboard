@@ -170,7 +170,8 @@ export default function App() {
   const skippedReasons = [...new Set(data.skipped.map((s) => s.reason))].join(", ")
 
   return (
-    <div className="min-h-svh bg-muted/40">
+    // One screen on wide screens (SPEC.md, "המסך"): the page does not scroll, the table and the charts scroll inside their own frames.
+    <div className="min-h-svh bg-muted/40 xl:flex xl:h-svh xl:flex-col xl:overflow-hidden">
       <SiteHeader
         status={{ kind: conn.source.kind, state: data.state, count: data.leads.length, fetchedAt: data.fetchedAt }}
         onRefresh={() => load(true)}
@@ -178,7 +179,7 @@ export default function App() {
       >
         <CurrencySelect />
       </SiteHeader>
-      <main className="mx-auto flex max-w-screen-2xl flex-col gap-3 px-3 py-3 lg:px-4">
+      <main className="mx-auto flex w-full max-w-screen-2xl flex-col gap-3 px-3 py-3 lg:px-4 xl:min-h-0 xl:flex-1">
         {data.state === "error" && (
           <Alert variant="destructive">
             <CircleAlertIcon />
@@ -211,7 +212,7 @@ export default function App() {
         ) : data.leads.length ? (
           <>
             {/* Control strip: filters and quick filters together (SPEC.md, "המסך"). */}
-            <div className="flex flex-col gap-3 rounded-lg border bg-card p-3 shadow-xs">
+            <div className="flex shrink-0 flex-col gap-3 rounded-lg border bg-card p-3 shadow-xs">
               <FilterBar
                 filters={filters}
                 owners={owners}
@@ -226,9 +227,9 @@ export default function App() {
             </div>
             <SectionCards k={kpis(rows)} days={filters.days} />
             {/* Work area: the leads table leads, charts sit in a narrow column beside it on wide screens. */}
-            <div className="grid grid-cols-1 items-start gap-3 xl:grid-cols-[minmax(0,1fr)_380px]">
+            <div className="grid grid-cols-1 items-start gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_380px] xl:grid-rows-[minmax(0,1fr)] xl:items-stretch">
               <LeadsTable rows={rows} sorting={sorting} onSortingChange={setSorting} onOpen={setOpenId} />
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-1">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:min-h-0 xl:grid-cols-1 xl:content-start xl:overflow-y-auto">
                 <WeeklyChart data={weeklyBuckets(rows, filters.days, now)} />
                 <SourceChart
                   data={sourceBreakdown(rows)}

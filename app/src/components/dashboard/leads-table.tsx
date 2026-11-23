@@ -122,7 +122,7 @@ export function LeadsTable({
   const pageCount = Math.max(1, table.getPageCount())
 
   return (
-    <Card className="gap-3 py-3 shadow-xs">
+    <Card className="gap-3 py-3 shadow-xs xl:min-h-0">
       <CardHeader className="gap-1 px-3">
         <CardTitle className="text-sm">
           לידים <span className="font-normal text-muted-foreground">({fmtNum(rows.length)})</span>
@@ -132,10 +132,11 @@ export function LeadsTable({
           עמוד {pagination.pageIndex + 1} מתוך {pageCount}
         </CardAction>
       </CardHeader>
-      <CardContent className="flex flex-col gap-3 px-3">
-        <div className="overflow-hidden rounded-md border">
+      <CardContent className="flex flex-col gap-3 px-3 xl:min-h-0 xl:flex-1">
+        {/* On wide screens this frame scrolls, and the column titles stay on top. */}
+        <div className="overflow-hidden rounded-md border xl:min-h-0 xl:flex-1 xl:[&>[data-slot=table-container]]:h-full xl:[&>[data-slot=table-container]]:overflow-auto">
           <Table className="text-[13px]">
-            <TableHeader className="bg-muted">
+            <TableHeader className="sticky top-0 z-10 bg-muted">
               {table.getHeaderGroups().map((hg) => (
                 <TableRow key={hg.id}>
                   {hg.headers.map((header) => {
@@ -201,7 +202,7 @@ export function LeadsTable({
             </TableBody>
           </Table>
         </div>
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex shrink-0 items-center justify-end gap-2">
           <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
             <ChevronRightIcon />
             הקודם
