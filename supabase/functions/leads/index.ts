@@ -9,6 +9,8 @@
 //   PATCH  /leads              { recordId, status, fromStatus }  change a status
 //   POST   /leads              { id, name, company, phone, source, owner,
 //                                budget, value, interest }       add a lead
+//   POST   /leads?action=score { recordId }  Claude AI score through the Make
+//                              scenario, returns the updated lead
 //   POST   /leads?action=seed  fill an empty table from airtable/leads-seed.csv
 //
 // Deployed with verify_jwt = false because the public site has no user login;
@@ -34,6 +36,8 @@ const STATUSES = ["new", "contacted", "qualified", "proposal", "won", "lost"]
 const SOURCES = ["website", "google_ads", "facebook", "referral", "linkedin", "event", "cold"]
 const BUDGETS = ["small", "medium", "large", "enterprise"]
 const NUMBER_FIELDS = new Set(["value", "emailOpens", "siteVisits", "firstResponseHours"])
+// Claude can take a few seconds; Make's webhook reply must arrive well before this.
+const SCORE_TIMEOUT_MS = 40_000
 
 type AirtableRecord = { id: string; createdTime?: string; fields: Record<string, unknown> }
 
@@ -160,6 +164,33 @@ async function updateStatus(body: Record<string, unknown>) {
   return { record }
 }
 
+// The Make scenario reads the lead, asks Claude for a score and a summary,
+// writes them to Airtable and replies with the score (SPEC.md, "ציון AI עם Claude").
+// The webhook address is a secret: whoever holds it can spend the project's Claude credit.
+async function scoreLead(body: Record<string, unknown>) {
+  const recordId = text(body.recordId, 17, "recordId", true)
+  if (!/^rec[A-Za-z0-9]{14}$/.test(recordId)) throw new HttpError(400, "invalid_field", "recordId is not an Airtable record id")
+  const hook = Deno.env.get("MAKE_SCORE_WEBHOOK_URL")
+  if (!hook) throw new HttpError(503, "missing_webhook", "MAKE_SCORE_WEBHOOK_URL is not set in the Supabase secrets")
+  let res: Response
+  try {
+    res = await fetch(hook, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ recordId }),
+      signal: AbortSignal.timeout(SCORE_TIMEOUT_MS),
+    })
+  } catch {
+    throw new HttpError(504, "make_timeout", "the Make scenario did not answer in time")
+  }
+  const reply = await res.json().catch(() => null)
+  // A plain "Accepted" means Make queued the request: the scenario is not active.
+  if (!res.ok || !reply?.ok) throw new HttpError(502, "make_failed", `the Make scenario did not return a score (${res.status})`)
+  const record: AirtableRecord = await airtable(`/${recordId}`)
+  await patchCache((rs) => rs.map((r) => (r.id === record.id ? record : r)))
+  return { record }
+}
+
 async function createLead(body: Record<string, unknown>) {
   const id = text(body.id, 12, "id", true)
   if (!/^L-\d{3,7}$/.test(id)) throw new HttpError(400, "invalid_field", "id must look like L-1261")
@@ -247,6 +278,7 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}))
 
     if (req.method === "POST" && url.searchParams.get("action") === "seed") return json(await seed(), 200, origin)
+    if (req.method === "POST" && url.searchParams.get("action") === "score") return json(await scoreLead(body), 200, origin)
     if (req.method === "POST") return json(await createLead(body), 201, origin)
     if (req.method === "PATCH") return json(await updateStatus(body), 200, origin)
     throw new HttpError(405, "method_not_allowed", `${req.method} is not supported`)
