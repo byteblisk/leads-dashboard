@@ -85,6 +85,8 @@ export default function App() {
   const [newOpen, setNewOpen] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
   const [saveError, setSaveError] = React.useState<string | null>(null)
+  const [scoring, setScoring] = React.useState(false)
+  const [scoreError, setScoreError] = React.useState<string | null>(null)
 
   const load = React.useCallback(
     async (refresh = false) => {
@@ -128,6 +130,23 @@ export default function App() {
       setSaveError(e instanceof Error ? e.message : String(e))
     } finally {
       setSaving(false)
+    }
+  }
+
+  // Claude AI score through the Make scenario (SPEC.md, "ציון AI עם Claude").
+  // The lead is replaced only when the server returns the updated record.
+  async function scoreLead(id: string) {
+    const lead = data.leads.find((l) => l.id === id)
+    if (!lead || !conn.source.score) return
+    setScoring(true)
+    setScoreError(null)
+    try {
+      const saved = await conn.source.score(lead)
+      setData((d) => ({ ...d, leads: d.leads.map((l) => (l.id === id ? saved : l)) }))
+    } catch (e) {
+      setScoreError(e instanceof Error ? e.message : String(e))
+    } finally {
+      setScoring(false)
     }
   }
 
@@ -227,10 +246,14 @@ export default function App() {
         onClose={() => {
           setOpenId(null)
           setSaveError(null)
+          setScoreError(null)
         }}
         onStatus={changeStatus}
         saving={saving}
         error={saveError}
+        onScore={conn.source.score ? scoreLead : undefined}
+        scoring={scoring}
+        scoreError={scoreError}
       />
       <NewLeadDialog
         open={newOpen}

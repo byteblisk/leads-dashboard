@@ -41,6 +41,8 @@ export interface DataSource {
   load(refresh?: boolean): Promise<LoadResult>
   setStatus(lead: RawLead, status: Status): Promise<RawLead>
   create(input: NewLeadInput): Promise<RawLead>
+  /** Claude AI score through Make. Only the project data has the Make scenario. */
+  score?(lead: RawLead): Promise<RawLead>
 }
 
 function toLead(rec: AirtableRecord): RawLead {
@@ -57,6 +59,9 @@ const PROXY_MESSAGES: Record<string, string> = {
   airtable_401: "המפתח של הפרויקט ב-Supabase לא תקין או בוטל.",
   airtable_403: "למפתח של הפרויקט אין הרשאה לבסיס.",
   airtable_429: "עברנו את מגבלת הקריאות של Airtable. נסו שוב בעוד 30 שניות.",
+  missing_webhook: "החיבור לתרחיש ב-Make עוד לא הוגדר: חסרה כתובת ה-webhook בסודות של Supabase.",
+  make_failed: "התרחיש ב-Make לא החזיר ציון. ייתכן שהוא כבוי, או שהקריאה ל-Claude נכשלה.",
+  make_timeout: "התרחיש ב-Make לא ענה בזמן. נסו שוב בעוד דקה.",
 }
 
 async function proxy(path: string, init: RequestInit = {}) {
@@ -89,6 +94,11 @@ export const projectSource: DataSource = {
   },
   async create(input) {
     const body = await proxy("", { method: "POST", body: JSON.stringify(input) })
+    return toLead(body.record)
+  },
+  async score(lead) {
+    if (!lead.recordId) throw new DataError("no_record_id", "לליד הזה אין מזהה רשומה של Airtable.")
+    const body = await proxy("?action=score", { method: "POST", body: JSON.stringify({ recordId: lead.recordId }) })
     return toLead(body.record)
   },
 }

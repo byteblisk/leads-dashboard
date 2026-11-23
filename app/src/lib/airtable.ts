@@ -84,6 +84,8 @@ export function parseRecord(rec: AirtableRecord): RawLead | SkippedRecord {
     created,
     lastContact: date(f.lastContact),
     firstResponseHours: num(f.firstResponseHours),
+    aiScore: num(f.aiScore),
+    aiSummary: str(f.aiSummary),
   }
 }
 

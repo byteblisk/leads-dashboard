@@ -56,6 +56,16 @@ const columns = col.columns([
       </span>
     ),
   }),
+  col.accessor((l) => l.aiScore ?? -1, {
+    id: "aiScore",
+    header: "ציון AI",
+    cell: ({ row }) =>
+      row.original.aiScore != null ? (
+        <span className="font-medium tabular-nums">{row.original.aiScore}</span>
+      ) : (
+        <span className="text-muted-foreground">-</span>
+      ),
+  }),
   col.accessor("name", { header: "שם", cell: ({ row }) => <span className="font-medium">{row.original.name}</span> }),
   col.accessor("company", { header: "עסק" }),
   col.accessor((l) => SOURCE_LABEL[l.source], { id: "source", header: "מקור" }),
