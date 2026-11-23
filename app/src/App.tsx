@@ -179,7 +179,7 @@ export default function App() {
       >
         <CurrencySelect />
       </SiteHeader>
-      <main className="mx-auto flex w-full max-w-screen-2xl xl:max-w-none flex-col gap-3 px-3 py-3 lg:px-4 xl:min-h-0 xl:flex-1">
+      <main className="mx-auto flex w-full max-w-[1600px] flex-col gap-3 px-3 py-3 lg:px-4 xl:min-h-0 xl:flex-1">
         {data.state === "error" && (
           <Alert variant="destructive">
             <CircleAlertIcon />
