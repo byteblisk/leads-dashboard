@@ -179,7 +179,7 @@ export default function App() {
       >
         <CurrencySelect />
       </SiteHeader>
-      <main className="mx-auto flex w-full max-w-screen-2xl flex-col gap-3 px-3 py-3 lg:px-4 xl:min-h-0 xl:flex-1">
+      <main className="mx-auto flex w-full max-w-screen-2xl xl:max-w-none flex-col gap-3 px-3 py-3 lg:px-4 xl:min-h-0 xl:flex-1">
         {data.state === "error" && (
           <Alert variant="destructive">
             <CircleAlertIcon />
@@ -226,10 +226,11 @@ export default function App() {
               </div>
             </div>
             <SectionCards k={kpis(rows)} days={filters.days} />
-            {/* Work area: the leads table leads, charts sit in a narrow column beside it on wide screens. */}
-            <div className="grid grid-cols-1 items-start gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,1fr)_380px] xl:grid-rows-[minmax(0,1fr)] xl:items-stretch">
+            {/* Work area: on wide screens the table takes 3/5 of the width and the charts 2/5.
+                The charts never scroll: weekly on top, sources and funnel side by side below. */}
+            <div className="grid grid-cols-1 items-start gap-3 xl:min-h-0 xl:flex-1 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] xl:grid-rows-[minmax(0,1fr)] xl:items-stretch">
               <LeadsTable rows={rows} sorting={sorting} onSortingChange={setSorting} onOpen={setOpenId} />
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:min-h-0 xl:grid-cols-1 xl:content-start xl:overflow-y-auto">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:min-h-0 xl:grid-rows-[minmax(0,1fr)_minmax(0,1.15fr)] xl:overflow-hidden md:[&>:first-child]:col-span-2">
                 <WeeklyChart data={weeklyBuckets(rows, filters.days, now)} />
                 <SourceChart
                   data={sourceBreakdown(rows)}

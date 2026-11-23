@@ -1,3 +1,4 @@
+import { InfoIcon } from "lucide-react"
 import { Bar, BarChart, CartesianGrid, Cell, LabelList, Line, LineChart, XAxis, YAxis } from "recharts"
 
 import * as React from "react"
@@ -6,6 +7,7 @@ import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle }
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { fmtNum, type funnel, type sourceBreakdown, type weeklyBuckets } from "@/lib/leads"
 import type { Source } from "@/data/mock-data"
 import { cn } from "@/lib/utils"
@@ -27,11 +29,23 @@ function ChartCard({
 }) {
   const [view, setView] = React.useState("chart")
   return (
-    <Card className={cn("gap-0 py-3 shadow-xs", className)}>
-      <Tabs value={view} onValueChange={setView} className="gap-0">
+    // On wide screens the card fills its grid cell and the chart takes whatever
+    // height is left (SPEC.md, "המסך"). The description moves into an info tooltip there.
+    <Card className={cn("gap-0 py-3 shadow-xs xl:h-full xl:min-h-0 xl:py-2.5", className)}>
+      <Tabs value={view} onValueChange={setView} className="gap-0 xl:h-full xl:min-h-0">
         <CardHeader className="gap-1 px-3">
-          <CardTitle className="text-sm">{title}</CardTitle>
-          <CardDescription className="text-xs leading-snug">{description}</CardDescription>
+          <CardTitle className="flex items-center gap-1.5 text-sm">
+            {title}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" aria-label={"הסבר: " + title} className="hidden text-muted-foreground hover:text-foreground xl:inline-flex">
+                  <InfoIcon className="size-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-64 text-xs leading-snug">{description}</TooltipContent>
+            </Tooltip>
+          </CardTitle>
+          <CardDescription className="text-xs leading-snug xl:sr-only">{description}</CardDescription>
           <CardAction>
             <TabsList aria-label={"תצוגה: " + title}>
               <TabsTrigger value="chart">גרף</TabsTrigger>
@@ -39,10 +53,10 @@ function ChartCard({
             </TabsList>
           </CardAction>
         </CardHeader>
-        <CardContent className="mt-2 px-2 sm:px-3">
-          <TabsContent value="chart">{chart}</TabsContent>
-          <TabsContent value="table">
-            <div className="overflow-hidden rounded-lg border">
+        <CardContent className="mt-2 px-2 sm:px-3 xl:mt-1 xl:min-h-0 xl:flex-1 xl:px-1.5">
+          <TabsContent value="chart" className="xl:h-full">{chart}</TabsContent>
+          <TabsContent value="table" className="xl:h-full xl:overflow-auto">
+            <div className="overflow-hidden rounded-lg border xl:text-xs xl:[&_td]:px-1.5 xl:[&_td]:py-1.5 xl:[&_th]:h-8 xl:[&_th]:px-1.5">
               <Table>
                 <TableHeader className="bg-muted">
                   <TableRow>
@@ -82,7 +96,7 @@ export function WeeklyChart({ data }: { data: ReturnType<typeof weeklyBuckets> }
       description="כל נקודה היא שבוע שמסתיים בתאריך שעל הציר. ריחוף מראה את מספר הלידים, ובתצוגת הטבלה מופיעים כל השבועות."
       table={{ head: ["שבוע", "לידים חדשים"], rows: data.map((d) => [d.range, fmtNum(d.leads)]) }}
       chart={
-        <ChartContainer config={lineConfig} className="aspect-auto h-[170px] w-full">
+        <ChartContainer config={lineConfig} className="aspect-auto h-[170px] w-full xl:h-full">
           <LineChart accessibilityLayer data={data} margin={{ top: 24, right: 16, left: 4, bottom: 0 }}>
             <CartesianGrid vertical={false} />
             <XAxis dataKey="week" tickLine={false} axisLine={false} tickMargin={8} minTickGap={24} />
@@ -173,10 +187,10 @@ export function SourceChart({
         rows: data.map((d) => [d.label, fmtNum(d.leads), fmtNum(d.won), d.rate.toFixed(1) + "%"]),
       }}
       chart={
-        <ChartContainer config={barConfig} className="aspect-auto h-[220px] w-full">
-          <BarChart accessibilityLayer data={data} layout="vertical" margin={{ top: 0, right: 4, left: 84, bottom: 0 }} barCategoryGap={8}>
+        <ChartContainer config={barConfig} className="aspect-auto h-[220px] w-full xl:h-full">
+          <BarChart accessibilityLayer data={data} layout="vertical" margin={{ top: 0, right: 4, left: 74, bottom: 0 }} barCategoryGap={8}>
             <XAxis type="number" dataKey="leads" reversed hide />
-            <YAxis type="category" dataKey="label" orientation="right" tickLine={false} axisLine={false} width={92} />
+            <YAxis type="category" dataKey="label" orientation="right" tickLine={false} axisLine={false} width={78} tick={{ width: 160 }} />
             <ChartTooltip
               cursor={{ fill: "var(--muted)" }}
               content={
@@ -221,10 +235,10 @@ export function FunnelChart({ data }: { data: ReturnType<typeof funnel> }) {
         rows: data.map((d) => [d.label, fmtNum(d.leads), d.pct.toFixed(1) + "%"]),
       }}
       chart={
-        <ChartContainer config={funnelConfig} className="aspect-auto h-[170px] w-full">
-          <BarChart accessibilityLayer data={data} layout="vertical" margin={{ top: 0, right: 4, left: 84, bottom: 0 }} barCategoryGap={10}>
+        <ChartContainer config={funnelConfig} className="aspect-auto h-[170px] w-full xl:h-full">
+          <BarChart accessibilityLayer data={data} layout="vertical" margin={{ top: 0, right: 4, left: 74, bottom: 0 }} barCategoryGap={10}>
             <XAxis type="number" dataKey="leads" reversed hide />
-            <YAxis type="category" dataKey="label" orientation="right" tickLine={false} axisLine={false} width={92} />
+            <YAxis type="category" dataKey="label" orientation="right" tickLine={false} axisLine={false} width={78} tick={{ width: 160 }} />
             <ChartTooltip
               cursor={{ fill: "var(--muted)" }}
               content={
