@@ -102,6 +102,15 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    /* Thin scrollbars that follow the theme (SPEC.md, "המסך"). */
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--muted-foreground) 45%, transparent) transparent;
+  }
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground;
