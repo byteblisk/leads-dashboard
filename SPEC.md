@@ -298,7 +298,7 @@
 
 ## איך מריצים
 
-הדשבורד פועל באתר [1g0rh.github.io/leads-dashboard](https://1g0rh.github.io/leads-dashboard/). כדי לעבוד על הקוד צריך Node.js, ומריצים:
+הדשבורד פועל באתר [byteblisk.github.io/leads-dashboard](https://byteblisk.github.io/leads-dashboard/). כדי לעבוד על הקוד צריך Node.js, ומריצים:
 
 ```bash
 cd app

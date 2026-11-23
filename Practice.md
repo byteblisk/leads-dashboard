@@ -160,7 +160,7 @@ the version from the branch being merged
 
 | מה | פרט |
 |---|---|
-| כתובת האתר | [1g0rh.github.io/leads-dashboard](https://1g0rh.github.io/leads-dashboard/) |
+| כתובת האתר | [byteblisk.github.io/leads-dashboard](https://byteblisk.github.io/leads-dashboard/) |
 | מקור הפרסום | הענף `main`, התיקייה הראשית |
 | הקובץ &lrm;`.nojekyll` | קובץ ריק שאומר ל-GitHub לפרסם את הקבצים כמו שהם, בלי לעבד אותם ב-Jekyll |
 
