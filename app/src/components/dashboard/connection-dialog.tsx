@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import type { AirtableConfig } from "@/lib/airtable"
 import { ownSource } from "@/lib/data-source"
 
-const TEMPLATE_URL = "https://github.com/1G0RH/leads-dashboard/blob/main/airtable/README.md"
+const TEMPLATE_URL = "https://github.com/byteblisk/leads-dashboard/blob/main/airtable/README.md"
 
 // "Airtable משלך" (SPEC.md, connection panel): built like the one from class.
 // Three fields, a "remember" box, connect / disconnect / forget, and a Hebrew

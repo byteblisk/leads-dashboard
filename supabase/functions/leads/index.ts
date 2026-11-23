@@ -18,12 +18,12 @@ import { createClient } from "jsr:@supabase/supabase-js@2"
 
 const BASE_ID = Deno.env.get("AIRTABLE_BASE_ID") ?? "app1OI1LVdbGwYVkr"
 const TABLE_ID = Deno.env.get("AIRTABLE_TABLE_ID") ?? "tblkaSZFXjydS0iue"
-const SEED_URL = "https://raw.githubusercontent.com/1G0RH/leads-dashboard/main/airtable/leads-seed.csv"
+const SEED_URL = "https://raw.githubusercontent.com/byteblisk/leads-dashboard/main/airtable/leads-seed.csv"
 const CACHE_SECONDS = 15 * 60
 const REFRESH_MIN_SECONDS = 60
 
 const ALLOWED_ORIGINS = [
-  "https://1g0rh.github.io",
+  "https://byteblisk.github.io",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "http://localhost:4173",
