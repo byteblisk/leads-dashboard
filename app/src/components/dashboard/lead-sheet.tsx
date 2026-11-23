@@ -1,7 +1,8 @@
-import { ArrowLeftIcon, CircleAlertIcon } from "lucide-react"
+import { ArrowLeftIcon, CircleAlertIcon, Loader2Icon, SparklesIcon } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -18,12 +19,19 @@ export function LeadSheet({
   onStatus,
   saving,
   error,
+  onScore,
+  scoring,
+  scoreError,
 }: {
   lead: Lead | null
   onClose: () => void
   onStatus: (id: string, s: Status) => void
   saving: boolean
   error: string | null
+  /** Present only for the project data, where the Make scenario exists. */
+  onScore?: (id: string) => void
+  scoring: boolean
+  scoreError: string | null
 }) {
   return (
     <Sheet open={!!lead} onOpenChange={(open) => !open && onClose()}>
@@ -89,6 +97,41 @@ export function LeadSheet({
                     <Progress value={(value / max) * 100} aria-label={label} className="[&>[data-slot=progress-indicator]]:bg-chart-3" />
                   </div>
                 ))}
+              </section>
+
+              <section aria-label="ציון AI" className="flex flex-col gap-2 rounded-md border p-3">
+                <div className="flex items-baseline justify-between">
+                  <h3 className="flex items-center gap-1.5 font-medium">
+                    <SparklesIcon className="size-4 text-chart-3" />
+                    ציון AI
+                  </h3>
+                  <span className="text-sm tabular-nums text-muted-foreground">
+                    {lead.aiScore != null ? (
+                      <>
+                        <span className="text-base font-semibold text-foreground">{lead.aiScore}</span> מתוך 100
+                      </>
+                    ) : (
+                      "עוד לא חושב"
+                    )}
+                  </span>
+                </div>
+                {lead.aiSummary && <p className="text-sm leading-relaxed">{lead.aiSummary}</p>}
+                {onScore && (
+                  <Button size="sm" variant="outline" className="self-start" disabled={scoring} onClick={() => onScore(lead.id)}>
+                    {scoring ? <Loader2Icon className="animate-spin" /> : <SparklesIcon />}
+                    {scoring ? "Claude בודק את הליד..." : lead.aiScore != null ? "חשב ציון AI מחדש" : "חשב ציון AI"}
+                  </Button>
+                )}
+                <p className="text-xs text-muted-foreground">
+                  Claude מעריך את הליד לפי הפרטים שלו. זה ציון נפרד מציון הליד של הדשבורד.
+                </p>
+                {scoreError && (
+                  <Alert variant="destructive">
+                    <CircleAlertIcon />
+                    <AlertTitle>החישוב נכשל</AlertTitle>
+                    <AlertDescription>{scoreError}</AlertDescription>
+                  </Alert>
+                )}
               </section>
 
               <Alert>

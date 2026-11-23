@@ -24,6 +24,10 @@ export interface RawLead {
   created: string
   lastContact: string | null
   firstResponseHours: number | null
+  /** Claude's score, 1 to 100, from the Make scenario. Missing until the lead is scored. */
+  aiScore?: number | null
+  /** Claude's short Hebrew summary of the lead. */
+  aiSummary?: string
 }
 
 function mulberry32(seed: number) {
