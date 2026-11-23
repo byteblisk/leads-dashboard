@@ -8,7 +8,7 @@
 
 ## צפייה
 
-הדשבורד פועל באתר [1g0rh.github.io/leads-dashboard](https://1g0rh.github.io/leads-dashboard/) ב-GitHub Pages.
+הדשבורד פועל באתר [byteblisk.github.io/leads-dashboard](https://byteblisk.github.io/leads-dashboard/) ב-GitHub Pages.
 
 כדי להריץ מקומית צריך Node.js. נכנסים לתיקייה `app`, מריצים `npm install` ואז `npm run dev`. ההסבר המלא נמצא באפיון.
 
