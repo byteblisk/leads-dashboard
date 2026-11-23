@@ -132,7 +132,7 @@ export function LeadsTable({
           עמוד {pagination.pageIndex + 1} מתוך {pageCount}
         </CardAction>
       </CardHeader>
-      <CardContent className="flex flex-col gap-3 px-3 xl:min-h-0 xl:flex-1">
+      <CardContent className="flex flex-col gap-3 px-3 xl:min-h-0 xl:flex-1 xl:px-2">
         {/* On wide screens this frame scrolls, and the column titles stay on top. */}
         <div className="overflow-hidden rounded-md border xl:min-h-0 xl:flex-1 xl:[&>[data-slot=table-container]]:h-full xl:[&>[data-slot=table-container]]:overflow-auto">
           <Table className="text-[13px]">
@@ -145,14 +145,14 @@ export function LeadsTable({
                     return (
                       <TableHead
                         key={header.id}
-                        className="h-9"
+                        className="h-9 px-1.5"
                         aria-sort={sorted === "asc" ? "ascending" : sorted === "desc" ? "descending" : undefined}
                       >
                         {canSort ? (
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="-ms-2 h-7 px-2 text-[13px] font-medium"
+                            className="-ms-1.5 h-7 gap-1 px-1.5 text-[13px] font-medium"
                             onClick={header.column.getToggleSortingHandler()}
                           >
                             <FlexRender header={header} />
@@ -186,7 +186,7 @@ export function LeadsTable({
                     }}
                   >
                     {row.getAllCells().map((cell) => (
-                      <TableCell key={cell.id} className={cn("px-2 py-1.5", cell.column.id === "next" && "min-w-44 whitespace-normal")}>
+                      <TableCell key={cell.id} className={cn("px-1.5 py-1.5", cell.column.id === "next" && "min-w-28 whitespace-normal")}>
                         <FlexRender cell={cell} />
                       </TableCell>
                     ))}
